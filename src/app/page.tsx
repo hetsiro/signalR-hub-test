@@ -5,7 +5,7 @@ import * as signalR from '@microsoft/signalr';
 
 export default function Home() {
   const [connection, setConnection] = useState<string | null>('Conectando al servidor...');
-  const [mensaje, setMensaje] = useState<any | null>(null);
+  const [mensaje, setMensaje] = useState<any | null>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
   useEffect(() => {
     // Crear conexión
     const connection = new signalR.HubConnectionBuilder()
