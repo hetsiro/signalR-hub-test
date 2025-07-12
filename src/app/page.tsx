@@ -48,7 +48,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className='bg-gray-100 border-4 border-gray-600 text-black p-4 rounded-lg min-w-1/2 min-h-1/2 flex flex-col justify-start items-center'>
+    <div className='bg-gradient-to-tr from-gray-500 to-stone-600 text-white p-4 rounded-lg min-w-1/2 min-h-1/2 flex flex-col justify-start items-center'>
       <h1 className='text-3xl font-bold'>{connection}</h1>
       <p className='my-auto text-3xl'>{JSON.stringify(mensaje)}</p>
     </div>
