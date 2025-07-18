@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${poppins.variable} antialiased h-screen w-full flex justify-center items-center bg-gray-900`}
+        className={`${poppins.variable} antialiased p-8 mx-auto`}
       >
         {children}
       </body>

@@ -1,44 +1,60 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import * as signalR from '@microsoft/signalr';
+import { useEffect, useState } from "react";
+import * as signalR from "@microsoft/signalr";
+import FormularioBasico from "@/components/FormularioBasico";
+import { Asistente } from "@/types/Asistente";
 
 export default function Home() {
-  const [connection, setConnection] = useState<string | null>('Conectando al servidor...');
-  const [mensaje, setMensaje] = useState<any | null>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const [connection, setConnection] = useState<string | null>(
+    "Conectando al servidor..."
+  );
+  const [browserId, setBrowserId] = useState<string | null>(null);
+  const [browserIdReconnected, setBrowserIdReconnected] = useState<
+    string | null
+  >(null);
+  const [asistente, setAsistente] = useState<Asistente | null>(null);
+
   useEffect(() => {
     // Crear conexión
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl('wss://api.primepass.cl/AcreditacionHub', {
+      .withUrl("wss://api.primepass.cl/AcreditacionHub", {
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets,
-        withCredentials: false
+        withCredentials: false,
       })
       .build();
 
     // Conectar
-    connection.start()
+    connection
+      .start()
       .then(() => {
-        console.log('Conectado al servidor');
-        setConnection('Conectado al servidor!');
-        // Te conectas Y le dices quién eres
-        connection.invoke('Identificarse', { userId: 'cristobal' })
-          .then(() => {
-            console.log('Servidor recibió tu identificación');
-          })
-          .catch((error) => {
-            console.log('Error, el servidor no recibió tu identificación:', error);
-          });
+        console.log("Conectado al servidor");
+        setConnection("Conectado al servidor!");
       })
       .catch((err) => {
-        setConnection('Error de conexión al servidor');
-        console.error('Error de conexión al servidor:', err);
+        setConnection("Error de conexión al servidor");
+        console.error("Error de conexión al servidor:", err);
       });
 
     // Escuchar eventos
-    connection.on('*', (datos) => {
-      console.log('Evento recibido:', datos);
-      setMensaje(datos);
+
+    connection.on("Connected", (data) => {
+      const connectionId = data.connectionId;
+      console.log("Evento Connected:", connectionId);
+      if (localStorage.getItem("browserId")) {
+        setBrowserId(localStorage.getItem("browserId") || null);
+        setBrowserIdReconnected(connectionId);
+      } else {
+        setBrowserId(localStorage.getItem("browserId") || null);
+        localStorage.setItem("browserId", connectionId);
+      }
+    });
+
+    connection.on("AsistenteCreado", (data) => {
+      const asistente = data;
+      console.log("Evento AsistenteCreado:", asistente);
+      setAsistente(asistente);
     });
 
     // Limpiar al desmontar
@@ -48,9 +64,37 @@ export default function Home() {
   }, []);
 
   return (
-    <div className='bg-gradient-to-tr from-gray-500 to-stone-600 text-white p-4 rounded-lg min-w-1/2 min-h-1/2 flex flex-col justify-start items-center'>
-      <h1 className='text-3xl font-bold'>{connection}</h1>
-      <p className='my-auto text-3xl'>{JSON.stringify(mensaje)}</p>
-    </div>
+    <>
+      <h1
+        className={`text-3xl font-bold text-center py-4 ${
+          connection === "Conectado al servidor!"
+            ? "text-green-500"
+            : "text-red-500"
+        }`}
+      >
+        {connection}
+      </h1>
+
+      {/* Formulario */}
+      {browserId ? (
+        <FormularioBasico
+          browserid={browserId}
+          asistente={asistente}
+          browserIdReconnected={browserIdReconnected}
+        />
+      ) : (
+        <div>Cargando BrowserId...</div>
+      )}
+      {/* Iframe */}
+      {/* {browserId && (
+        <div className="mt-8 w-full">
+          <iframe 
+            src={`https://qa.circulodeespecialistas.cl/inscripcion-mejor-maestro?browserid=${browserId}`}
+            className="w-full h-96 border-0"
+            title="Formulario de inscripción"
+          />
+        </div>
+      )} */}
+    </>
   );
-} 
+}
