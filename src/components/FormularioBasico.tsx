@@ -58,8 +58,8 @@ export default function FormularioBasico({
     console.log("Datos del formulario:", formData);
     setLoading(true);
 
-    // Aquí puedes hacer el POST con los datos
-    fetch("https://api.primepass.cl/api/mejormaestro/formtest", {
+    // Usar el proxy de Next.js para evitar CORS
+    fetch("/api/mejormaestro/formtest", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

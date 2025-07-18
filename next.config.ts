@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async rewrites() {
+    return [
+      {
+        source: "/api/mejormaestro/:path*",
+        destination: "https://api.primepass.cl/api/mejormaestro/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
