@@ -46,7 +46,7 @@ export default function Home() {
         setBrowserId(localStorage.getItem("browserId") || null);
         setBrowserIdReconnected(connectionId);
       } else {
-        setBrowserId(localStorage.getItem("browserId") || null);
+        setBrowserId(connectionId);
         localStorage.setItem("browserId", connectionId);
       }
     });
